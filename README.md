@@ -1,5 +1,7 @@
 # qsr-zig
 
+**[Status](STATUS.md) · [Roadmap](ROADMAP.md) · [Contributing](CONTRIBUTING.md) · [Issues](https://github.com/SMC17/qsr-zig/issues) · [All SMC17 work](https://github.com/users/SMC17/projects/16)**
+
 Rank of a bit-packed matrix over GF(2) in Zig 0.16, with SIMD row elimination. Apache-2.0.
 
 ```zig
