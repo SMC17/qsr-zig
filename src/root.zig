@@ -1,54 +1,25 @@
+//! qsr-zig: rank of a bit-packed matrix over GF(2), with SIMD row elimination.
+//!
+//! A matrix is `rows` rows of `row_words` u64 words each, row-major, bit c of
+//! a row stored at word c/64, bit c%64. Elimination is in place.
 const std = @import("std");
-pub const snf = @import("snf_fused.zig");
 
-pub const Simplex = struct {
-    vertices: []const u32,
-    dimension: usize,
-};
+pub const morphogenetic = @import("snf_morphogenetic.zig");
+pub const fused = @import("snf_fused.zig");
 
-pub const SimplicialComplex = struct {
-    allocator: std.mem.Allocator,
-    simplices: std.ArrayList(Simplex),
+/// Rank over GF(2). Destroys `matrix` (it is left in reduced row form).
+pub fn rankGF2(matrix: []u64, rows: usize, row_words: usize) usize {
+    std.debug.assert(matrix.len >= rows * row_words);
+    return morphogenetic.reduceSNF(matrix, rows, row_words);
+}
 
-    pub fn init(alloc: std.mem.Allocator) SimplicialComplex {
-        return .{
-            .allocator = alloc,
-            .simplices = std.ArrayList(Simplex).empty,
-        };
-    }
+test {
+    _ = @import("diff_test.zig");
+}
 
-    pub fn deinit(self: *SimplicialComplex) void {
-        for (self.simplices.items) |s| {
-            self.allocator.free(s.vertices);
-        }
-        self.simplices.deinit(self.allocator);
-    }
-
-    /// Extract Betti numbers using the Fused Fetch-Reduce SNF kernel.
-    pub fn extractBettiNumbers(self: *const SimplicialComplex, vector_ptr: [*]const f32) !struct { b0: u32, b1: u32, b2: u32 } {
-        // High-performance boundary matrix reduction
-        const rows = 128; // Standard dimension for this substrate
-        const cols = 128;
-        const row_words = (cols + 63) / 64;
-        const matrix = try self.allocator.alloc(u64, rows * row_words);
-        defer self.allocator.free(matrix);
-        
-        // Populate matrix from vector features (simplified topological mapping)
-        for (0..rows) |r| {
-            const val = vector_ptr[r];
-            const word = @as(u64, @bitCast(@as(i64, @intFromFloat(val))));
-            for (0..row_words) |w| {
-                matrix[r * row_words + w] = word ^ (r +% w);
-            }
-        }
-
-        const rank = snf.fusedReduceSNF(vector_ptr, matrix, rows, row_words);
-
-        // Map rank to Betti dimensions (Weaponized Homology Proxy)
-        return .{ 
-            .b0 = @intCast(rank % 100), 
-            .b1 = @intCast((rank / 100) % 100), 
-            .b2 = @intCast(rank / 10000) 
-        };
-    }
-};
+test "identity has full rank, duplicate row drops it" {
+    var m = [_]u64{ 1, 2, 4, 8 };
+    try std.testing.expectEqual(@as(usize, 4), rankGF2(&m, 4, 1));
+    var d = [_]u64{ 3, 3, 5 };
+    try std.testing.expectEqual(@as(usize, 2), rankGF2(&d, 3, 1));
+}
