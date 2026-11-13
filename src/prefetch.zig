@@ -1,5 +1,5 @@
 const std = @import("std");
-const morphogenetic = @import("snf_morphogenetic.zig");
+const elimination = @import("elimination.zig");
 
 /// Prefetch the first 64 floats at `vector_ptr`, then compute GF(2) rank of
 /// `matrix` in place.
@@ -19,5 +19,5 @@ pub fn fusedReduceSNF(
     while (p < 64) : (p += 16) {
         @prefetch(vector_ptr + p, .{ .rw = .read, .locality = 3, .cache = .data });
     }
-    return morphogenetic.reduceSNF(matrix, rows, row_words);
+    return elimination.reduceSNF(matrix, rows, row_words);
 }

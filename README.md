@@ -33,6 +33,6 @@ No performance claim is made. There is no benchmark yet.
 | File | What |
 |---|---|
 | `src/root.zig` | `rankGF2` entry point |
-| `src/snf_morphogenetic.zig` | elimination with 8-lane `@Vector(8, u64)` row swap and XOR |
-| `src/snf_fused.zig` | prefetch, then the same elimination |
+| `src/elimination.zig` | elimination with 8-lane `@Vector(8, u64)` row swap and XOR |
+| `src/prefetch.zig` | prefetch, then the same elimination |
 | `src/diff_test.zig` | differential tests against a naive reference |

@@ -1,7 +1,7 @@
 //! Differential tests: both SIMD kernels against a naive GF(2) Gaussian elimination.
 const std = @import("std");
-const morph = @import("snf_morphogenetic.zig");
-const fused = @import("snf_fused.zig");
+const morph = @import("elimination.zig");
+const fused = @import("prefetch.zig");
 
 fn naiveRank(m: []u64, rows: usize, row_words: usize) usize {
     var rank: usize = 0;

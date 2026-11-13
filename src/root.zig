@@ -4,13 +4,13 @@
 //! a row stored at word c/64, bit c%64. Elimination is in place.
 const std = @import("std");
 
-pub const morphogenetic = @import("snf_morphogenetic.zig");
-pub const fused = @import("snf_fused.zig");
+pub const elimination = @import("elimination.zig");
+pub const prefetch = @import("prefetch.zig");
 
 /// Rank over GF(2). Destroys `matrix` (it is left in reduced row form).
 pub fn rankGF2(matrix: []u64, rows: usize, row_words: usize) usize {
     std.debug.assert(matrix.len >= rows * row_words);
-    return morphogenetic.reduceSNF(matrix, rows, row_words);
+    return elimination.reduceSNF(matrix, rows, row_words);
 }
 
 test {
