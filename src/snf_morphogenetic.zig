@@ -1,10 +1,10 @@
 const std = @import("std");
 
-/// Morphogenetic SNF Kernel: Evolved SIMD XOR-reduction.
-/// Top-performing candidate from generation SIGMA-7.
+/// GF(2) rank by Gaussian elimination with SIMD row swap and XOR.
+/// Returns the rank; `matrix` is left in reduced row form.
 pub fn reduceSNF(matrix: []u64, rows: usize, row_words: usize) usize {
     var pivot_row: usize = 0;
-    const Vec = @Vector(8, u64); // 512-bit SIMD
+    const Vec = @Vector(8, u64); // 8 x u64 lanes
 
     var rank: usize = 0;
 
